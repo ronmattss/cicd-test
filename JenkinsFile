@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/yourusername/my-node-app.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    dockerImage = docker.build("my-node-app")
+                }
+            }
+        }
+
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             dockerImage.inside {
+        //                 sh 'npm test'
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    dockerImage.run('-p 3000:3000')
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
