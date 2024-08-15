@@ -1,8 +1,8 @@
 # Dockerfile
-FROM node:14
+FROM node:lts
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/testApp
 
 # Install app dependencies
 COPY package*.json ./
