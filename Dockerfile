@@ -1,16 +1,27 @@
-# Dockerfile
-FROM node:lts
+# Stage 1: Build the React app
+FROM node:lts AS build
 
-# Create app directory
-WORKDIR /usr/src/testApp
+# Set the working directory
+WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY package*.json ./
 RUN npm install
 
-# Bundle app source
+# Copy the rest of the application code
 COPY . .
 
-# Expose port and start application
-EXPOSE 3001
-CMD ["npm", "start"]
+# Build the React app
+RUN npm run build
+
+# Stage 2: Serve the React app with nginx
+FROM nginx:alpine
+
+# Copy the build output to the nginx html directory
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# Expose the port nginx is using
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
